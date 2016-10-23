@@ -24,7 +24,7 @@ void get_random(int n, double * u) {
 
 void f() {
     struct vegas_state * state = vegas_new(2, 50);
-    vegas_set_verbose(state, 1);
+    vegas_set_verbose(state, 2);
     
     double x[2];
     double r[2];

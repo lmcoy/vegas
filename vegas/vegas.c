@@ -77,6 +77,9 @@ struct vegas_state {
     int refine_grid;
     int verbose;
     clock_t start_time;
+    int Ntot; /// total number of points
+    double fb_tot;
+    double f2b_tot;
 };
 
 void refine_grid(struct vegas_state * state, struct Matrix *d);
@@ -107,6 +110,10 @@ struct vegas_state *  vegas_new(int ndim, int nbin) {
     state->State.it = 0;
     state->verbose = 0;
     state->start_time = 0;
+    
+    state->Ntot = 0;
+    state->fb_tot = 0.0;
+    state->f2b_tot = 0.0;
     
     int_state_init(&state->Istate, ndim, nbin);
     
@@ -204,6 +211,18 @@ static void finish_iteration(struct vegas_state * state, int update_grid) {
 #endif
     
     if(state->MPI.rank == 0) {
+        state->Ntot += ncalls_total;
+        int N = state->Ntot;
+        double jac_tot = 1.0 / ((double)N);
+        double dv2g_tot = 1.0 / (N - 1.0);
+        state->fb_tot += fb;
+        state->f2b_tot += f2b;
+        double integral_tot = state->fb_tot * jac_tot;
+        double f2b_tot = state->f2b_tot * jac_tot * jac_tot;
+        f2b_tot = sqrt(f2b_tot * N);
+        f2b_tot = (f2b_tot - integral_tot) * (f2b_tot + integral_tot);
+        double sigma_tot = sqrt(f2b_tot * dv2g_tot);
+        
         double jac = 1.0/((double)ncalls_total);
         double dv2g = 1.0 / (ncalls_total - 1.0);
         fb *= jac;
@@ -244,6 +263,10 @@ static void finish_iteration(struct vegas_state * state, int update_grid) {
             state->start_time = end;
             printf( "iteration %d:\n", it);
             printf( "  %g +- %g (chi^2/ndf = %g) %s\n", integral, sd, chi2_ndf, time_buffer);
+            if (state->verbose > 1) {
+                printf( "    this iteration only: %g +- %g\n", integral_it, sigma_it);
+                printf( "    assume only one iteration: %g +- %g\n", integral_tot, sigma_tot);
+            }
         }
         if (update_grid) {
             refine_grid(state, d);
@@ -258,6 +281,9 @@ static void finish_iteration(struct vegas_state * state, int update_grid) {
     MPI_Bcast(&state->si, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&state->schi, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&state->swgt, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&state->f2b_tot, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&state->fb_tot, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&state->Ntot, 1, MPI_INT, 0, MPI_COMM_WORLD);
 #endif
 }
 
@@ -304,6 +330,9 @@ void vegas_init_integration(struct vegas_state * state, int iterations, int nper
     state->schi = 0.0;
     state->swgt = 0.0;
     state->start_time = 0;
+    state->Ntot = 0;
+    state->fb_tot = 0.0;
+    state->f2b_tot = 0.0;
 }
 
 void vegas_get_integral(struct vegas_state * state, double * integral, double * error, double *chi2_ndf) {
