@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		CAEAA6521D1604FF00F4ABA0 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = CAEAA6511D1604FF00F4ABA0 /* main.c */; };
+		CAEAA65A1D16054200F4ABA0 /* vegas.c in Sources */ = {isa = PBXBuildFile; fileRef = CAEAA6591D16054200F4ABA0 /* vegas.c */; };
+		CAEAA65D1D16DB9300F4ABA0 /* interface.i in Sources */ = {isa = PBXBuildFile; fileRef = CAEAA65C1D16DB9300F4ABA0 /* interface.i */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,10 @@
 /* Begin PBXFileReference section */
 		CAEAA64E1D1604FF00F4ABA0 /* vegas */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vegas; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAEAA6511D1604FF00F4ABA0 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		CAEAA6581D16052C00F4ABA0 /* vegas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vegas.h; sourceTree = "<group>"; };
+		CAEAA6591D16054200F4ABA0 /* vegas.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vegas.c; sourceTree = "<group>"; };
+		CAEAA65B1D161CB900F4ABA0 /* matrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = matrix.h; sourceTree = "<group>"; };
+		CAEAA65C1D16DB9300F4ABA0 /* interface.i */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c.preprocessed; path = interface.i; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +64,10 @@
 			isa = PBXGroup;
 			children = (
 				CAEAA6511D1604FF00F4ABA0 /* main.c */,
+				CAEAA65C1D16DB9300F4ABA0 /* interface.i */,
+				CAEAA6581D16052C00F4ABA0 /* vegas.h */,
+				CAEAA6591D16054200F4ABA0 /* vegas.c */,
+				CAEAA65B1D161CB900F4ABA0 /* matrix.h */,
 			);
 			path = vegas;
 			sourceTree = "<group>";
@@ -118,6 +128,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAEAA65A1D16054200F4ABA0 /* vegas.c in Sources */,
+				CAEAA65D1D16DB9300F4ABA0 /* interface.i in Sources */,
 				CAEAA6521D1604FF00F4ABA0 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
