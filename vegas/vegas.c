@@ -188,8 +188,11 @@ static void finish_iteration(struct vegas_state * state, int update_grid) {
     double f2b = 0.0;
     MPI_Reduce(&istate->f2b, &f2b, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     
-    struct Matrix *d = matrix_new(nbin, ndim);
-    MPI_Reduce(istate->d->m, d->m, nbin*ndim, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+    struct Matrix *d = NULL;
+    if (update_grid) {
+        d = matrix_new(nbin, ndim);
+        MPI_Reduce(istate->d->m, d->m, nbin*ndim, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+    }
     
     int ncalls_total = 0;
     MPI_Reduce(&istate->ncalls, &ncalls_total, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -205,7 +208,9 @@ static void finish_iteration(struct vegas_state * state, int update_grid) {
         double dv2g = 1.0 / (ncalls_total - 1.0);
         fb *= jac;
         f2b *= jac * jac;
-        matrix_mul_factor(d, jac * jac);
+        if (update_grid) {
+            matrix_mul_factor(d, jac * jac);
+        }
         f2b = sqrt(f2b * ncalls_total);
         f2b = (f2b - fb) * (f2b + fb);
         if (f2b <= 0.0) {
@@ -247,6 +252,7 @@ static void finish_iteration(struct vegas_state * state, int update_grid) {
 #ifndef NOMPI
     // broadcast new grid
     if (update_grid) {
+        matrix_free(d);
         MPI_Bcast(state->xi->m, ndim * nbin, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     }
     MPI_Bcast(&state->si, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
